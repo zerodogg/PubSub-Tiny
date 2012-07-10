@@ -1,0 +1,9 @@
+# Standard ignores
+*~
+*.swp
+# Ignores of files that get created, but shouldn't be added to git
+Makefile
+Makefile.old
+blib/
+pm_to_blib
+MYMETA.*
