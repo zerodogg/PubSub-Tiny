@@ -3,7 +3,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 50;
+plan tests => 55;
 
 use_ok('PubSub::Tiny');
 
@@ -101,6 +101,7 @@ my $successSub = sub { $success++ };
 # --
 {
     $success = 0;
+    my $specialListenerSuccess = 0;
     my $unsub;
     # Sanity checking
     my $tinyPubSub = PubSub::Tiny->new(strict => 1);
@@ -108,8 +109,12 @@ my $successSub = sub { $success++ };
     isa_ok($tinyPubSub,'PubSub::Tiny');
     ok($tinyPubSub->strict,'Strict should be true');
     ok(!$tinyPubSub->registered('something'),'Everything is not "registered"');
+    ok($tinyPubSub->registered('*'),'* is special and should always be registered');
 
     # Basic events
+    my $specialUnsub = $tinyPubSub->subscribe('*',sub {
+            $specialListenerSuccess++;
+        });
     tryCatch(1,sub { $unsub = $tinyPubSub->subscribe('test',$successSub); },'Should not be able to subscribe to unregistered event');
     $tinyPubSub->register('test');
     $unsub = $tinyPubSub->subscribe('test',$successSub);
@@ -117,6 +122,7 @@ my $successSub = sub { $success++ };
     ok($success,'Event emitted');
     $tinyPubSub->publish('test');
     is($success,2,'Event emitted twice');
+    is($specialListenerSuccess,2,'* should have been called twice');
 
     # Unsubscribing
     $success = 0;
@@ -137,6 +143,7 @@ my $successSub = sub { $success++ };
     $tinyPubSub->unsubscribe($unsub);
     $tinyPubSub->publish('secondTest');
     is($success,1,'One secondTest events should have been published');
+    is($specialListenerSuccess,5,'* should have been called five times');
 
     # Multiple different subscribers
     ok(!$tinyPubSub->registered('anotherTest'),'anotherTest should not already be registered');
@@ -153,7 +160,10 @@ my $successSub = sub { $success++ };
     is_deeply($success, [ 'first','second' ]);
     $success = [];
     $tinyPubSub->unsubscribe($unsub);
+    is($specialListenerSuccess,6,'* should have been called six times');
+    $tinyPubSub->unsubscribe($specialUnsub);
     $tinyPubSub->publish('anotherTest');
+    is($specialListenerSuccess,6,'* should still have been called six times');
     is_deeply($success, [ 'second' ]);
 }
 
