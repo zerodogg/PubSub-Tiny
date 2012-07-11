@@ -53,7 +53,7 @@ sub registered
     {
         croak('PubSub::Tiny: Invalid number of parameters to registered()');
     }
-    if(defined $self->__subscribers->{$event})
+    if(defined $self->__subscribers->{$event} || $event eq '*')
     {
         return 1;
     }
@@ -87,6 +87,10 @@ sub publish
                 $subscriber->($data);
             }
         }
+    }
+    if ($event ne '*')
+    {
+        $self->publish('*',{ event => $event, data => $data });
     }
     return 1;
 }
@@ -178,6 +182,8 @@ some data, that will be provided to your callback as its first parameter.
 The returned HANDLE variable can be supplied ti the unsubscribe() method
 if you want to stop listening to the event.
 
+See the EVENT NAMING section for information about naming events.
+
 Strict mode only: Will die if EVENT has not been registered.
 
 =head2 $object->unsubscribe(HANDLE)
@@ -203,6 +209,27 @@ to said event in the future. If strict mode is not active, this is a no-op.
 
 When in strict mode, returns true if an event has been registered, false otherwise.
 If strict mode is not active this will always return true.
+
+=head1 EVENT NAMING
+
+In general I<PubSub::Tiny> does not enforce any kind of event naming scheme.
+You're free to use whichever naming convention you're comfortable with, with
+whichever characters you want. The only special event is "*", which is described
+below.
+
+=head2 THE SPECIAL * EVENT
+
+"*" (without the quotes) is the only special event name in PubSub::Tiny.
+Subscribers to * will get called on EVERY EVENT. Its data parameter is in the
+form:
+
+    { event => REAL_EVENT, data => REAL_DATA }
+
+Where REAL_EVENT is the name of the event that is actually being published, and
+REAL_DATA is the data that was passed along with that event (if any).
+
+Note that * is dispatched last in the call chain, so if a callback higher up
+in the chain dies, it will not be called (see DISPATCH ORDER).
 
 =head1 EXPORT
 
