@@ -3,7 +3,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 56;
+plan tests => 60;
 
 use_ok('PubSub::Tiny');
 
@@ -170,6 +170,17 @@ my $successSub = sub { $success++ };
     tryCatch(1,sub {
         $tinyPubSub->register('anotherTest');
     }, 'Should not be able to register() an event twice');
+
+    # Registering multiple events
+    $tinyPubSub->register(qw(multiRegTest1 multiRegTest2 multiRegTest3));
+    ok($tinyPubSub->registered('multiRegTest1') && $tinyPubSub->registered('multiRegTest2') && $tinyPubSub->registered('multiRegTest3'),
+        'All multiRegTest* events should be registered');
+
+    tryCatch(1,sub {
+            $tinyPubSub->register('multiRegTest4',undef,'multiRegTest5');
+        },'Should fail to register "undef"');
+    ok($tinyPubSub->registered('multiRegTest4'),'multiRegTest4 should have been registered');
+    ok(!$tinyPubSub->registered('multiRegTest5'),'multiRegTest5 should not have been registered');
 }
 
 # --

@@ -32,17 +32,24 @@ sub register
         return;
     }
 
-    my $event = shift;
-    if (!defined $event)
+    if (@_ < 1)
     {
         croak('PubSub::Tiny: Invalid number of parameters to register()');
     }
-    if ($self->registered($event))
-    {
-        croak('PubSub::Tiny: Attempted to register an event that has already been registered: '.$event);
-    }
 
-    $self->__subscribers->{$event} = [];
+    foreach my $event(@_)
+    {
+        if (!defined $event)
+        {
+            croak('PubSub::Tiny: Got an undef event');
+        }
+        if ($self->registered($event))
+        {
+            croak('PubSub::Tiny: Attempted to register an event that has already been registered: '.$event);
+        }
+
+        $self->__subscribers->{$event} = [];
+    }
 }
 
 sub registered
@@ -204,10 +211,11 @@ each listeners callback function.
 
 Strict mode only: Will die if EVENT has not been registered.
 
-=head2 Strict mode: $object->register(EVENT)
+=head2 Strict mode: $object->register(EVENT1, EVENT2, ..)
 
-When in strict mode, register an event. This declares your intention to publish
-to said event in the future. If strict mode is not active, this is a no-op.
+When in strict mode, register one or more events. This declares your intention
+to publish to said event(s) in the future. If strict mode is not active,
+this is a no-op.
 
 =head2 Strict mode: $object->registered(EVENT)
 
