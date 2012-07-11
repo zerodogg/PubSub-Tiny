@@ -252,7 +252,7 @@ Nothing
 
 =head1 AUTHOR
 
-Eskild Hustvedt, E<lt>zerodogg@cpan.org<gt>
+Eskild Hustvedt, E<lt>zerodogg@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
