@@ -83,6 +83,10 @@ sub publish
     my $event = shift;
     my $data = shift;
 
+    if(!defined($event))
+    {
+        croak('PubSub::Tiny: No event name supplied');
+    }
     if (! $self->registered($event))
     {
         croak('PubSub::Tiny: Attempt to publish unregistered event "'.$event.'"');
@@ -118,6 +122,10 @@ sub subscribe
     my $event = shift;
     my $callback = shift;
 
+    if(!defined($event))
+    {
+        croak('PubSub::Tiny: No event name supplied');
+    }
     if (! $self->registered($event))
     {
         croak('PubSub::Tiny: Attempt to subscribe to unregistered event "'.$event.'"');

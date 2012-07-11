@@ -3,7 +3,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 60;
+plan tests => 62;
 
 use_ok('PubSub::Tiny');
 
@@ -94,6 +94,14 @@ my $successSub = sub { $success++ };
     $tinyPubSub->unsubscribe($unsub);
     $tinyPubSub->publish('anotherTest');
     is_deeply($success, [ 'second' ]);
+
+    # It shouldn't be possible to publish or subscribe to undef
+    tryCatch(1,sub {
+            $tinyPubSub->subscribe(undef,sub { });
+        },'Should not be possible to subscribe to undef');
+    tryCatch(1,sub {
+            $tinyPubSub->publish(undef);
+        },'Should not be possible to publish to undef');
 }
 
 # --
