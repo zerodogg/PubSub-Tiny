@@ -37,6 +37,10 @@ sub register
     {
         croak('PubSub::Tiny: Invalid number of parameters to register()');
     }
+    if ($self->registered($event))
+    {
+        croak('PubSub::Tiny: Attempted to register an event that has already been registered: '.$event);
+    }
 
     $self->__subscribers->{$event} = [];
 }

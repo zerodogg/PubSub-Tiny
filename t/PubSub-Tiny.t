@@ -3,7 +3,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 55;
+plan tests => 56;
 
 use_ok('PubSub::Tiny');
 
@@ -165,6 +165,11 @@ my $successSub = sub { $success++ };
     $tinyPubSub->publish('anotherTest');
     is($specialListenerSuccess,6,'* should still have been called six times');
     is_deeply($success, [ 'second' ]);
+    
+    # It's not possible to register an event twice
+    tryCatch(1,sub {
+        $tinyPubSub->register('anotherTest');
+    }, 'Should not be able to register() an event twice');
 }
 
 # --
