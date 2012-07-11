@@ -231,6 +231,21 @@ REAL_DATA is the data that was passed along with that event (if any).
 Note that * is dispatched last in the call chain, so if a callback higher up
 in the chain dies, it will not be called (see DISPATCH ORDER).
 
+=head1 DISPATCH ORDER
+
+When you publish an event, each subscriber will be called in turn. The order
+in which they are called is the order in which they subscribed, so the first
+subscriber will be called first, then the second and so on. Listeners to * are
+always called after listeners to the event itself, but in the order that
+they subscribed to *.
+
+=head1 EXCEPTION HANDLING
+
+PubSub::Tiny does NO exceptions handling. If a callback dies, then the chain
+will get interrupted, and any subscribers that would have been called after
+the one that died will not get called, and the die will propagate up to
+your code, so it will be your responsibility to properly handle these.
+
 =head1 EXPORT
 
 Nothing
